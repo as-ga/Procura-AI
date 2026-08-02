@@ -16,7 +16,7 @@ export interface Bundle {
 
 export interface Reasoning {
   summary: string;
-  advantages: string[];
+  reasons: string[];
   tradeoffs: string[];
 }
 

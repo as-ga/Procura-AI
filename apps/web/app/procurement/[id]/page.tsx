@@ -17,7 +17,6 @@ export default async function ProcurementPage({ params }: Props) {
 
   try {
     const res = await procurementApi.get(id);
-
     const procurement = res.data.data;
 
     return (
@@ -55,7 +54,10 @@ export default async function ProcurementPage({ params }: Props) {
 
           <ReasoningCard reasoning={procurement.reasoning} />
 
-          <ApproveButton procurementId={procurement.id} />
+          <ApproveButton
+            procurementId={procurement.id}
+            status={procurement.status}
+          />
         </main>
       </>
     );

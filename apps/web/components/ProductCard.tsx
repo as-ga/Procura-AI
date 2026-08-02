@@ -28,7 +28,7 @@ export default function ProductCard({ product }: Props) {
       </div>
 
       <div className="text-xs text-zinc-500">
-        Warranty {product.warranty} months
+        Warranty {product.warranty} years
       </div>
     </Card>
   );
