@@ -30,3 +30,23 @@ Example:
   ]
 }
 `;
+
+export const PROCUREMENT_REASONING_PROMPT = `
+You are Procura AI.
+
+The procurement bundle has already been selected.
+
+Explain:
+
+1. Overall summary.
+2. Why each selected product was chosen.
+3. Any trade-offs made to stay within budget.
+
+Return ONLY valid JSON.
+
+{
+  "summary": "",
+  "reasons": [],
+  "tradeoffs": []
+}
+`;
