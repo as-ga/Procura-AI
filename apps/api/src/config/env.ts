@@ -1,0 +1,31 @@
+import dotenv from "dotenv";
+import { z } from "zod";
+
+dotenv.config();
+
+const envSchema = z.object({
+  PORT: z.coerce.number().default(5000),
+
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
+
+  CLIENT_URL: z.string().url(),
+  OPENAI_API_KEY: z.string().min(1),
+  PRAVA_API_KEY: z.string().min(1),
+  PRAVA_BASE_URL: z.string().url(),
+});
+
+const parsed = envSchema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error("❌ Invalid environment variables");
+  console.error(parsed.error.format());
+
+  process.exit(1);
+}
+
+export const env = Object.freeze({
+  ...parsed.data,
+  isDev: parsed.data.NODE_ENV === "development",
+});
