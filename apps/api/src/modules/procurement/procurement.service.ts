@@ -1,43 +1,26 @@
+import { planProcurement } from "@/providers/ai/ai";
 import { ProcurementPlan } from "./procurement.types";
-import { ApiError } from "@/utils/apiHandler";
+import { products } from "@/data/products";
 
-export async function plannerService(prompt: string): Promise<ProcurementPlan> {
-  // TODO:
-  // OpenAI Integration
-
+async function plannerService(prompt: string): Promise<ProcurementPlan> {
+  const result = await planProcurement(prompt);
   return {
     id: crypto.randomUUID(),
     prompt,
-    role: "Frontend Developer",
-    budget: 80000,
-    requiredItems: ["Laptop", "Monitor", "Keyboard", "Mouse"],
+    role: result.role,
+    budget: result.budget,
+    requiredItems: result.requiredItems,
     status: "PLANNED",
   };
 }
 
-export async function productFinderService() {
-  // TODO
-}
-
-export async function bundleOptimizerService() {
-  // TODO
-}
-
-export async function reasoningService() {
-  // TODO
+async function productFinderService(requiredItems: string[]) {
+  return products.filter((product) => requiredItems.includes(product.category));
 }
 
 export async function createProcurement(prompt: string) {
-  // const plan = await plannerService(prompt);
+  const plan = await plannerService(prompt);
+  const matchedProducts = await productFinderService(plan.requiredItems);
 
-  // if (!plan) throw new ApiError(500, "Failed to generate procurement plan.");
-
-  return {
-    id: crypto.randomUUID(),
-    prompt,
-    role: "Frontend Developer",
-    budget: 80000,
-    requiredItems: ["Laptop", "Monitor", "Keyboard", "Mouse"],
-    status: "PLANNED",
-  };
+  return { ...plan, products: matchedProducts };
 }
