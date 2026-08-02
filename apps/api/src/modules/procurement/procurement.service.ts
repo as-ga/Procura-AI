@@ -8,7 +8,8 @@ import {
   Procurement,
 } from "./procurement.types";
 
-const normalize = (value: number, min: number, max: number) => {
+const normalize = (value: number, min: number, max: number): number => {
+  if (max === min) return 1;
   return (value - min) / (max - min);
 };
 
@@ -64,23 +65,29 @@ async function bundleOptimizerService(
   const bundle: Product[] = [];
   let totalCost = 0;
 
-  // Get unique categories from matched products
-  const categories = [...new Set(products.map((p) => p.category))];
+  const categories = [...new Set(products.map((product) => product.category))];
 
   for (const category of categories) {
-    const categoryProducts = products
-      .filter((product) => product.category === category)
-      .sort(
-        (a, b) =>
-          calculateProductScore(b, categoryProducts) -
-          calculateProductScore(a, categoryProducts)
-      );
+    // Get all products for the current category
+    const categoryProducts = products.filter(
+      (product) => product.category === category
+    );
 
+    // Sort products by score (highest first)
+    categoryProducts.sort(
+      (a, b) =>
+        calculateProductScore(b, categoryProducts) -
+        calculateProductScore(a, categoryProducts)
+    );
+
+    // Pick the best product that fits within the remaining budget
     const selectedProduct = categoryProducts.find(
       (product) => totalCost + product.price <= budget
     );
 
-    if (!selectedProduct) continue;
+    if (!selectedProduct) {
+      continue;
+    }
 
     bundle.push(selectedProduct);
     totalCost += selectedProduct.price;
@@ -117,7 +124,6 @@ export async function createProcurement(prompt: string) {
   const matchedProducts = await productFinderService(plan.requiredItems);
   const bundle = await bundleOptimizerService(matchedProducts, plan.budget);
   const reasoning = await generateReasoning(plan, bundle);
-
   const procurement: Procurement = {
     ...plan,
     bundle,

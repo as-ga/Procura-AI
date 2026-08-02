@@ -19,6 +19,14 @@ const create = asyncHandler(async (req, res) => {
     );
 });
 
+const get = asyncHandler(async (req, res) => {
+  const procurement = await getProcurement(req.params.id as string);
+
+  return res.json(
+    new ApiResponse(200, "Procurement fetched successfully.", procurement)
+  );
+});
+
 const approve = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -40,4 +48,4 @@ const approve = asyncHandler(async (req, res) => {
     );
 });
 
-export { create, approve };
+export { create, get, approve };

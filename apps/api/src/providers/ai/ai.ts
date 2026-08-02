@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-import { env } from "@/config/env";
+import { env } from "@/config";
 import { ApiError } from "@/utils/apiHandler";
 import {
   PROCUREMENT_SYSTEM_PROMPT,
@@ -13,28 +13,41 @@ import {
   ProcurementPlannerResult,
 } from "@/modules/procurement/procurement.types";
 
-const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+const client = env.OPENAI_BASE_URL
+  ? new OpenAI({ apiKey: env.OPENAI_API_KEY, baseURL: env.OPENAI_BASE_URL })
+  : new OpenAI({ apiKey: env.OPENAI_API_KEY });
 
 async function generateStructuredOutput<T>(
   systemPrompt: string,
   userPrompt: string,
-  schema: { [key: string]: unknown } // JSON Schema object like schema: object
+  schema: { [key: string]: unknown } // JSON Schema object
 ): Promise<T> {
   try {
-    const response = await client.responses.create({
-      model: "gpt-4.1-mini",
-      input: [
+    const response = await client.chat.completions.create({
+      model: env.OPENAI_MODEL || "gpt-4o-mini",
+
+      messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      text: {
-        format: { type: "json_schema", name: "response", strict: true, schema },
+
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "procurement_response",
+          schema: schema,
+        },
       },
     });
 
-    return JSON.parse(response.output_text) as T;
+    const rawContent = response.choices[0]?.message?.content;
+    if (!rawContent) {
+      throw new ApiError(500, "AI returned an empty response.");
+    }
+
+    return JSON.parse(rawContent) as T;
   } catch (error) {
-    console.error(error);
+    console.error("Error generating structured output:", error);
     throw new ApiError(500, "AI request failed.");
   }
 }
