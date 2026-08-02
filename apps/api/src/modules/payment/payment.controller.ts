@@ -5,8 +5,12 @@ import { getProcurement } from "@/modules/procurement/procurement.service";
 import { createPaymentSchema } from "./payment.schema";
 import { createPravaSession } from "./payment.service";
 
+import { createReceipt } from "@/modules/receipt/receipt.service";
+import { getPayment, savePayment } from "./payment.service";
+
 const create = asyncHandler(async (req, res) => {
   const { procurementId } = createPaymentSchema.parse(req.body);
+  if (!procurementId) throw new ApiError(400, "Procurement ID is required.");
 
   const procurement = await getProcurement(procurementId);
 
@@ -19,6 +23,7 @@ const create = asyncHandler(async (req, res) => {
     procurement.bundle.totalCost
   );
 
+  if (!payment) throw new ApiError(500, "Failed to create payment session.");
   return res
     .status(201)
     .json(
@@ -26,8 +31,17 @@ const create = asyncHandler(async (req, res) => {
     );
 });
 
-import { createReceipt } from "@/modules/receipt/receipt.service";
-import { getPayment, savePayment } from "./payment.service";
+const get = asyncHandler(async (req, res) => {
+  const { id } = req.params as { id: string };
+
+  const payment = await getPayment(id);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, "Payment session retrieved successfully.", payment)
+    );
+});
 
 const success = asyncHandler(async (req, res) => {
   const { id } = req.params as { id: string };
@@ -57,4 +71,4 @@ const success = asyncHandler(async (req, res) => {
   );
 });
 
-export { create, success };
+export { create, get, success };

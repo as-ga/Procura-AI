@@ -38,16 +38,22 @@ export async function createPravaSession(
         user_email: "ashutosh@example.com",
         total_amount: amount.toFixed(2),
         currency: "USD",
-        merchant_details: {
-          name: "Procura AI",
-          url: "https://procura-ai.vercel.app",
-          country_code_iso2: "IN",
-        },
-        product_details: [
+
+        purchase_context: [
           {
-            description: "AI Procurement Order",
-            unit_price: amount.toFixed(2),
-            quantity: 1,
+            merchant_details: {
+              name: "Procura AI",
+              url: env.CLIENT_URL,
+              country_code_iso2: "US",
+            },
+
+            product_details: [
+              {
+                description: "AI Procurement Order",
+                unit_price: amount.toFixed(2),
+                quantity: 1,
+              },
+            ],
           },
         ],
       },
@@ -74,7 +80,12 @@ export async function createPravaSession(
 
     return payment;
   } catch (error) {
-    console.error(error);
+    if (axios.isAxiosError(error)) {
+      console.error("Status:", error.response?.status);
+      console.error("Response:", error.response?.data);
+    } else {
+      console.error(error);
+    }
     throw new ApiError(500, "Failed to create Prava session.");
   }
 }

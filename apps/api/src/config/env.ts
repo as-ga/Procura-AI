@@ -16,9 +16,12 @@ const envSchema = z.object({
 
   // OpenAI API configuration
   OPENAI_API_KEY: z.string().min(1),
+  OPENAI_BASE_URL: z.string().url().optional(),
+  OPENAI_MODEL: z.string().min(1).optional(),
 
   // Prava API configuration
   PRAVA_SECRET_KEY: z.string().min(1),
+  PRAVA_PUBLISHABLE_KEY: z.string().min(1),
   PRAVA_BASE_URL: z.string().url(),
 });
 
