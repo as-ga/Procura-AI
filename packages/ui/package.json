@@ -9,7 +9,8 @@
   ],
   "exports": {
     "./styles.css": "./dist/index.css",
-    "./*": "./dist/*.js"
+    "./*": "./dist/*.js",
+    ".": "./src/index.ts"
   },
   "license": "MIT",
   "scripts": {
@@ -32,5 +33,11 @@
     "eslint": "^9.39.1",
     "tailwindcss": "^4.1.5",
     "typescript": "5.9.2"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.28.0",
+    "tailwind-merge": "^3.6.0"
   }
 }
