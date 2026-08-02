@@ -10,6 +10,7 @@ const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
 
+  REDIS_URL: z.string().url(),
   CLIENT_URL: z.string().url(),
   OPENAI_API_KEY: z.string().min(1),
   PRAVA_API_KEY: z.string().min(1),
