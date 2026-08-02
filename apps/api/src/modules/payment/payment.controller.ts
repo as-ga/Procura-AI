@@ -26,4 +26,35 @@ const create = asyncHandler(async (req, res) => {
     );
 });
 
-export { create };
+import { createReceipt } from "@/modules/receipt/receipt.service";
+import { getPayment, savePayment } from "./payment.service";
+
+const success = asyncHandler(async (req, res) => {
+  const { id } = req.params as { id: string };
+
+  const payment = await getPayment(id);
+
+  if (payment.status === "SUCCESS") {
+    throw new ApiError(400, "Payment already completed.");
+  }
+
+  payment.status = "SUCCESS";
+  payment.updatedAt = new Date().toISOString();
+
+  await savePayment(payment);
+
+  const receipt = await createReceipt(
+    payment.id,
+    payment.procurementId,
+    payment.amount
+  );
+
+  return res.status(200).json(
+    new ApiResponse(200, "Payment completed successfully.", {
+      payment,
+      receipt,
+    })
+  );
+});
+
+export { create, success };
