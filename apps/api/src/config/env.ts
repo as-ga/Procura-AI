@@ -10,10 +10,15 @@ const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
 
+  // Database configuration
   REDIS_URL: z.string().url(),
   CLIENT_URL: z.string().url(),
+
+  // OpenAI API configuration
   OPENAI_API_KEY: z.string().min(1),
-  PRAVA_API_KEY: z.string().min(1),
+
+  // Prava API configuration
+  PRAVA_SECRET_KEY: z.string().min(1),
   PRAVA_BASE_URL: z.string().url(),
 });
 
